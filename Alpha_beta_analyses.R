@@ -81,3 +81,37 @@ tab.shannon <- wilcox.shannon$p.value %>%
 tab.shannon
 
 ##Beta Diversity
+
+# PCOA plots using the same phyloseq object
+#PCOA: for each diet based on experimental days**
+###CF**###
+
+ps.sub.CTRL <- subset_samples(ps, diet %in% c("D0", "CF"))
+
+dist = phyloseq::distance(ps.sub.CTRL, method="bray")
+ordination = ordinate(ps.sub.CTRL, method="PCoA", distance=dist)
+
+p1<-plot_ordination(ps.sub.CTRL, ordination, color="age", shape = "line") + 
+  theme_bw()+ geom_point(size=3)+ ggtitle("CF") + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+
+print(p1)
+
+###NUS**###
+  
+ps.sub.NUS <- subset_samples(ps, diet %in% c("D0", "NUS"))
+
+dist = phyloseq::distance(ps.sub.NUS, method="bray")
+ordination = ordinate(ps.sub.NUS, method="PCoA", distance=dist)
+
+p2<- plot_ordination(ps.sub.NUS, ordination, color="experimental.day", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("NUS") + stat_ellipse(aes(group = experimental.day), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+
+print(p2)
+
+############
