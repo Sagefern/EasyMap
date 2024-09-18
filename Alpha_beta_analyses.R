@@ -79,3 +79,5 @@ tab.shannon <- wilcox.shannon$p.value %>%
   gather(key="group2", value="p.adj", -group1) %>%
   na.omit()
 tab.shannon
+
+##Beta Diversity
