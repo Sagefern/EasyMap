@@ -68,6 +68,20 @@ TREE = read_tree("tree.nwk")
 ps <- phyloseq(OTU, TAX, SAMPLE,TREE)
 
 ##Alpha Diversity
+#Shannon plot##
+library(qiime2R)
+metadata1<-read_q2metadata("metadata.tsv")
+view(metadata1)
+
+shannon<-read_qza("shannon_vector.qza")
+shannon<-shannon$data %>% rownames_to_column("SampleID") # this moves the sample names to a new column that matches the metadata and allows them to be merged
+view(shannon)
+gplots::venn(list(metadata=metadata1$SampleID, shannon=shannon$SampleID)) #from diagram, we see that all samples in metadata have assigned Shannon diversity value
+
+metadata2<- metadata1 %>% left_join(shannon) 
+head(metadata2)
+write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
+
 #For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
 rich = estimate_richness(ps, measures = c("Observed", "Shannon"))
 wilcox.shannon <- pairwise.wilcox.test(rich$Shannon, 
@@ -81,6 +95,8 @@ tab.shannon <- wilcox.shannon$p.value %>%
 tab.shannon
 
 ##Beta Diversity
+
+
 
 # PCOA plots using the same phyloseq object
 #PCOA: for each diet based on experimental days**
@@ -96,21 +112,21 @@ p1<-plot_ordination(ps.sub.CTRL, ordination, color="age", shape = "line") +
   scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
   theme(strip.background = element_blank())
 
-
-print(p1)
+print(P1)
 
 ###NUS**###
   
 ps.sub.NUS <- subset_samples(ps, diet %in% c("D0", "NUS"))
-
+#str(ps.sub.NUS)
+#sample_data(ps.sub.NUS)$age_factor <- as.factor(sample_data(ps.sub.NUS)$age)
+#sample_data(ps.sub.NUS)$line_factor <- as.factor(sample_data(ps.sub.NUS)$line)
 dist = phyloseq::distance(ps.sub.NUS, method="bray")
 ordination = ordinate(ps.sub.NUS, method="PCoA", distance=dist)
 
-p2<- plot_ordination(ps.sub.NUS, ordination, color="experimental.day", shape = "line") + geom_point(size=3) +
-  theme_bw() + ggtitle("NUS") + stat_ellipse(aes(group = experimental.day), linetype = 2) +
-  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
-  theme(strip.background = element_blank())
-
+p2<- plot_ordination(ps.sub.NUS, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("NUS") + stat_ellipse(aes(group = age_factor), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank()) + labs(shape="Line", colour="Experimental Day")
 
 print(p2)
 
