@@ -32,6 +32,8 @@ tax.clean <- data.frame(row.names = row.names(tax),
                         Genus = str_replace(tax[,6], "g__",""),
                         Species = str_replace(tax[,7], "s__",""),
                         stringsAsFactors = FALSE)
+#The stringsAsFactors = FALSE argument means that all character columns in the 
+#tax.clean data frame will remain as character data types instead of being converted to factors. 
 
 tax.clean[is.na(tax.clean)] <- ""
 tax.clean[tax.clean=="__"] <- ""
@@ -70,17 +72,17 @@ ps <- phyloseq(OTU, TAX, SAMPLE,TREE)
 ##Alpha Diversity
 #Shannon plot##
 library(qiime2R)
-metadata1<-read_q2metadata("metadata.tsv")
-view(metadata1)
+#metadata1<-read_q2metadata("metadata.tsv")
+#view(metadata1)
 
-shannon<-read_qza("shannon_vector.qza")
-shannon<-shannon$data %>% rownames_to_column("SampleID") # this moves the sample names to a new column that matches the metadata and allows them to be merged
-view(shannon)
-gplots::venn(list(metadata=metadata1$SampleID, shannon=shannon$SampleID)) #from diagram, we see that all samples in metadata have assigned Shannon diversity value
+#shannon<-read_qza("shannon_vector.qza")
+#shannon<-shannon$data %>% rownames_to_column("SampleID") # this moves the sample names to a new column that matches the metadata and allows them to be merged
+#view(shannon)
+#gplots::venn(list(metadata=metadata1$SampleID, shannon=shannon$SampleID)) #from diagram, we see that all samples in metadata have assigned Shannon diversity value
 
-metadata2<- metadata1 %>% left_join(shannon) 
-head(metadata2)
-write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
+#metadata2<- metadata1 %>% left_join(shannon) 
+#head(metadata2)
+#write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
 
 #For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
 rich = estimate_richness(ps, measures = c("Observed", "Shannon"))
@@ -92,7 +94,10 @@ tab.shannon <- wilcox.shannon$p.value %>%
   tibble::rownames_to_column(var = "group1") %>%
   gather(key="group2", value="p.adj", -group1) %>%
   na.omit()
+
 tab.shannon
+# Exporting to CSV
+write.csv(tab.shannon, "tab_shannon.csv", row.names = FALSE)
 
 ##Beta Diversity
 
