@@ -84,10 +84,14 @@ library(qiime2R)
 #head(metadata2)
 #write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
 
-#For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
+##For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
+metadata_clean <- metadata %>%
+  mutate(diet = paste0(toupper(substr(metadata$line, 1, 2)), "_", diet)) 
+SAMPLE1 = sample_data(metadata_clean)
+wilcox_ps <- phyloseq(OTU, TAX, SAMPLE1,TREE)
 rich = estimate_richness(ps, measures = c("Observed", "Shannon"))
 wilcox.shannon <- pairwise.wilcox.test(rich$Shannon, 
-                                       sample_data(ps)$diet, 
+                                       sample_data(wilcox_ps)$diet, 
                                        p.adjust.method = "BH")
 tab.shannon <- wilcox.shannon$p.value %>%
   as.data.frame() %>%
