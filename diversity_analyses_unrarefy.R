@@ -9,7 +9,7 @@ load_package <- function(p) {
   library(p, character.only = TRUE, quietly = TRUE)
 }
 invisible(lapply(c(p1,p2), load_package))
-
+install.packages("ggpubr", repos = "https://cloud.r-project.org/", dependencies = TRUE)
 warnings()
 
 #Building a phyloseq object
@@ -84,6 +84,9 @@ library(qiime2R)
 #head(metadata2)
 #write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
 
+##Shannon boxplots (diet?)
+
+
 ##For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
 metadata_clean <- metadata %>%
   mutate(diet = paste0(toupper(substr(metadata$line, 1, 2)), "_", diet)) 
@@ -108,6 +111,8 @@ write.csv(tab.shannon, "tab_shannon.csv", row.names = FALSE)
 
 
 # PCOA plots using the same phyloseq object
+library(ggplot2)
+library(ggpubr)
 #PCOA: for each diet based on experimental days**
 ###CF**###
 
@@ -121,10 +126,9 @@ p1<-plot_ordination(ps.sub.CTRL, ordination, color="age", shape = "line") +
   scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
   theme(strip.background = element_blank())
 
-print(P1)
+print(p1)
 
 ###NUS**###
-  
 ps.sub.NUS <- subset_samples(ps, diet %in% c("D0", "NUS"))
 #str(ps.sub.NUS)
 #sample_data(ps.sub.NUS)$age_factor <- as.factor(sample_data(ps.sub.NUS)$age)
@@ -133,10 +137,116 @@ dist = phyloseq::distance(ps.sub.NUS, method="bray")
 ordination = ordinate(ps.sub.NUS, method="PCoA", distance=dist)
 
 p2<- plot_ordination(ps.sub.NUS, ordination, color="age", shape = "line") + geom_point(size=3) +
-  theme_bw() + ggtitle("NUS") + stat_ellipse(aes(group = age_factor), linetype = 2) +
+  theme_bw() + ggtitle("NUS") + stat_ellipse(aes(group = age), linetype = 2) +
   scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ scale_shape_manual(values=c(16, 1))+
   theme(strip.background = element_blank()) + labs(shape="Line", colour="Experimental Day")
 
 print(p2)
 
-############
+
+####MHP**###
+ps.sub.MHP <- subset_samples(ps, diet %in% c("D0", "MHP"))
+
+dist = phyloseq::distance(ps.sub.MHP, method="bray")
+ordination = ordinate(ps.sub.MHP, method="PCoA", distance=dist)
+
+p3<- plot_ordination(ps.sub.MHP, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("MHP")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p3)
+
+###MLP**
+ps.sub.MLP <- subset_samples(ps, diet %in% c("D0", "MLP"))
+
+dist = phyloseq::distance(ps.sub.MLP, method="bray")
+ordination = ordinate(ps.sub.MLP, method="PCoA", distance=dist)
+
+p4 <- plot_ordination(ps.sub.MLP, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("MLP")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p4)
+
+###**M**
+ps.sub.M <- subset_samples(ps, diet %in% c("D0", "M"))
+
+dist = phyloseq::distance(ps.sub.M, method="bray")
+ordination = ordinate(ps.sub.M, method="PCoA", distance=dist)
+
+p5 <- plot_ordination(ps.sub.M, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("M")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p5)
+
+###P**
+ps.sub.P <- subset_samples(ps, diet %in% c("D0", "P"))
+
+dist = phyloseq::distance(ps.sub.P, method="bray")
+ordination = ordinate(ps.sub.P, method="PCoA", distance=dist)
+
+p6 <- plot_ordination(ps.sub.P, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("P")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p6)
+
+###OKA**
+ps.sub.OKA <- subset_samples(ps, diet %in% c("D0", "OKA"))
+
+dist = phyloseq::distance(ps.sub.OKA, method="bray")
+ordination = ordinate(ps.sub.OKA, method="PCoA", distance=dist)
+
+p7 <- plot_ordination(ps.sub.OKA, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("OKA")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p7)
+
+###PKM**
+ps.sub.PKM <- subset_samples(ps, diet %in% c("D0", "PKM"))
+
+dist = phyloseq::distance(ps.sub.PKM, method="bray")
+ordination = ordinate(ps.sub.PKM, method="PCoA", distance=dist)
+
+p8 <- plot_ordination(ps.sub.PKM, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("PKM")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p8)
+
+###RIB**
+ps.sub.RIB <- subset_samples(ps, diet %in% c("D0", "RIB"))
+
+dist = phyloseq::distance(ps.sub.RIB, method="bray")
+ordination = ordinate(ps.sub.RIB, method="PCoA", distance=dist)
+
+p9 <- plot_ordination(ps.sub.RIB, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("RIB")  + stat_ellipse(aes(group = age), linetype = 2) +
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p9)
+
+###SBM**
+ps.sub.SBM <- subset_samples(ps, diet %in% c("D0", "SBM"))
+
+dist = phyloseq::distance(ps.sub.SBM, method="bray")
+ordination = ordinate(ps.sub.SBM, method="PCoA", distance=dist)
+
+p10 <- plot_ordination(ps.sub.SBM, ordination, color="age", shape = "line") + geom_point(size=3) +
+  theme_bw() + ggtitle("SBM")  + stat_ellipse(aes(group = age), linetype = 2) + 
+  scale_color_manual(values=c("orange", "deeppink", "brown4"),limits = c("D0", "D5", "D10"))+ labs(shape="Line", colour="Experimental Day")+ scale_shape_manual(values=c(16, 1))+
+  theme(strip.background = element_blank())
+
+print(p10)
+
+
+ggarrange(p1, p2, p8, p10, p5, p3, p9, p6, p7, p4, nrow=5, ncol=2, common.legend = TRUE, legend="bottom")
