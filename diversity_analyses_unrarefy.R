@@ -84,15 +84,23 @@ library(qiime2R)
 #head(metadata2)
 #write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
 
-##Shannon boxplots (diet?)
-library(phyloseq)
+##Shannon boxplots (line?)
 plot_richness(ps, x="line", measures=c("Shannon")) +
   geom_boxplot() +
   theme_classic() +
   theme(strip.background = element_blank(), axis.text.x.bottom = element_text(angle = -90))
-shannon_entropy <- rownames_to_column(estimate_richness(ps, split = TRUE, measures = "Shannon"), var = "SampleID")
 
+##Shannon boxplots
+library(phyloseq)
+library(qiime2R)
+shannon <- rownames_to_column(estimate_richness(ps, split = TRUE, measures = "Shannon"), var = "SampleID")
+metadata1<-read_q2metadata("metadata.tsv")
+gplots::venn(list(metadata=metadata1$SampleID, shannon=shannon$SampleID))
+metadata_shannon<- metadata1 %>% left_join(shannon)
 
+head(metadata_shannon)
+
+write.table(metadata_shannon, file = "shannonmetadata.csv", sep = ",")
 ##For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
 metadata_clean <- metadata %>%
   mutate(diet = paste0(toupper(substr(metadata$line, 1, 2)), "_", diet)) 
