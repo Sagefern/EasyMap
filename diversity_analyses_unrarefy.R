@@ -69,8 +69,8 @@ TREE = read_tree("tree.nwk")
 # merge the data
 ps <- phyloseq(OTU, TAX, SAMPLE,TREE)
 
-##Alpha Diversity
-#Shannon plot##
+######Alpha Diversity#########
+##Shannon plot##
 library(qiime2R)
 #metadata1<-read_q2metadata("metadata.tsv")
 #view(metadata1)
@@ -90,7 +90,7 @@ plot_richness(ps, x="line", measures=c("Shannon")) +
   theme_classic() +
   theme(strip.background = element_blank(), axis.text.x.bottom = element_text(angle = -90))
 
-##Shannon boxplots
+##Shannon metadata
 library(phyloseq)
 library(qiime2R)
 shannon <- rownames_to_column(estimate_richness(ps, split = TRUE, measures = "Shannon"), var = "SampleID")
@@ -101,6 +101,83 @@ metadata_shannon<- metadata1 %>% left_join(shannon)
 head(metadata_shannon)
 
 write.table(metadata_shannon, file = "shannonmetadata.csv", sep = ",")
+
+#Plot for D0 and D5**
+  
+met_D5 <- metadata_shannon[c(1:33,64:95),c(1:17)]
+view(met_D5)
+
+met_D5$diet_f = factor(met_D5$diet, levels=c('D0','CF','OKA','PKM','RIB','SBM', 'M', 'P', 'MHP', 'MLP', 'NUS'))
+str(met_D5) #check col types
+legend_title <- "Line" #rename the legend
+
+plot1<-met_D5 %>%
+  filter(!is.na(Shannon)) %>%
+  ggplot(aes(x= line, y=Shannon, fill=line)) +
+  stat_summary(geom="bar", fun.data=mean_se, color="black") + #here black is the outline for the bars
+  geom_jitter(shape=21, width=0.1, height=0) +
+  coord_cartesian(ylim=c(0,7)) + # adjust y-axis
+  facet_grid(~diet_f) + # create a panel for each body site
+  xlab("Diet") +
+  ylab("Shannon Diversity") +
+  theme_q2r() +
+  scale_fill_manual(legend_title, values=c("black","white")) + #use renamed legend and specify custom colors
+  theme(legend.position="right") + theme(axis.text.x=element_blank())+ theme(text=element_text(size = 15)) 
+plot1
+**Plot for D0 and D10**
+  
+  ```
+met3 <- metadata1[c(1:3,34:66,96:125),c(1:17)]
+view(met3)
+
+met3$diet_f = factor(met3$diet, levels=c('D0','CF','OKA','PKM','RIB','SBM', 'M', 'P', 'MHP', 'MLP', 'NUS'))
+legend_title <- "Line" #rename the legend
+
+plot2<-met3 %>%
+  filter(!is.na(shannon_entropy)) %>%
+  ggplot(aes(x= line, y=shannon_entropy, fill=line)) +
+  stat_summary(geom="bar", fun.data=mean_se, color="black") + #here black is the outline for the bars
+  geom_jitter(shape=21, width=0.1, height=0) +
+  coord_cartesian(ylim=c(0,7)) + # adjust y-axis
+  facet_grid(~diet_f) + # create a panel for each body site
+  xlab("Diet") +
+  ylab("Shannon Diversity") +
+  theme_q2r() +
+  scale_fill_manual(legend_title, values=c("black","white")) + #use renamed legend and specify custom colors
+  theme(legend.position="right") + theme(axis.text.x=element_blank())+ theme(text=element_text(size = 15)) 
+
+
+
+plot <- ggarrange(plot1 + rremove("ylab") + rremove("xlab"), plot2 + rremove("ylab") + rremove("xlab"), # remove axis labels from plots
+                  ncol = 1, nrow = 2,
+                  common.legend = TRUE, legend = "bottom")
+
+
+
+annotate_figure(plot, left = textGrob("Shannon Diversity", rot = 90, vjust = 0.5, gp = gpar(cex = 1.3)),
+                bottom = textGrob("Diet", gp = gpar(cex = 1.3)))
+
+```
+
+# significance of variables
+
+```
+hist(metadata1$shannon_entropy, main="Shannon diversity", xlab="", breaks=10)
+
+aov.shannon.line = aov(shannon_entropy ~ line, data=metadata1)
+#Call for the summary of that ANOVA, which will include P-values
+summary(aov.shannon.line)
+
+aov.shannon.diet = aov(shannon_entropy ~ diet, data=metadata1)
+#Call for the summary of that ANOVA, which will include P-values
+summary(aov.shannon.diet)
+
+
+aov.shannon.age = aov(shannon_entropy ~ age, data=metadata1)
+#Call for the summary of that ANOVA, which will include P-values
+summary(aov.shannon.age)
+
+
 ##For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
 metadata_clean <- metadata %>%
   mutate(diet = paste0(toupper(substr(metadata$line, 1, 2)), "_", diet)) 
