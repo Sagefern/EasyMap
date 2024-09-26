@@ -160,19 +160,18 @@ annotate_figure(plot, left = textGrob("Shannon Diversity", rot = 90, vjust = 0.5
 
 # significance of variables
 
-```
-hist(metadata1$shannon_entropy, main="Shannon diversity", xlab="", breaks=10)
+hist(metadata_shannon$Shannon, main="Shannon diversity", xlab="", breaks=10) #we see normal distribution
 
-aov.shannon.line = aov(shannon_entropy ~ line, data=metadata1)
+aov.shannon.line = aov(Shannon ~ line, data=metadata_shannon)
 #Call for the summary of that ANOVA, which will include P-values
 summary(aov.shannon.line)
 
-aov.shannon.diet = aov(shannon_entropy ~ diet, data=metadata1)
+aov.shannon.diet = aov(Shannon ~ diet, data=metadata_shannon)
 #Call for the summary of that ANOVA, which will include P-values
 summary(aov.shannon.diet)
 
 
-aov.shannon.age = aov(shannon_entropy ~ age, data=metadata1)
+aov.shannon.age = aov(Shannon ~ age, data=metadata_shannon)
 #Call for the summary of that ANOVA, which will include P-values
 summary(aov.shannon.age)
 
