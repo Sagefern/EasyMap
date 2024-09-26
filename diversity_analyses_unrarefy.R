@@ -124,18 +124,17 @@ plot1<-met_D5 %>%
   scale_fill_manual(legend_title, values=c("black","white")) + #use renamed legend and specify custom colors
   theme(legend.position="right") + theme(axis.text.x=element_blank())+ theme(text=element_text(size = 15)) 
 plot1
-**Plot for D0 and D10**
-  
-  ```
-met3 <- metadata1[c(1:3,34:66,96:125),c(1:17)]
-view(met3)
 
-met3$diet_f = factor(met3$diet, levels=c('D0','CF','OKA','PKM','RIB','SBM', 'M', 'P', 'MHP', 'MLP', 'NUS'))
+#Plot for D0 and D10**
+met_D10 <- metadata_shannon[c(1:3,34:66,96:125),c(1:17)]
+view(met_D10)
+
+met_D10$diet_f = factor(met_D10$diet, levels=c('D0','CF','OKA','PKM','RIB','SBM', 'M', 'P', 'MHP', 'MLP', 'NUS'))
 legend_title <- "Line" #rename the legend
 
-plot2<-met3 %>%
-  filter(!is.na(shannon_entropy)) %>%
-  ggplot(aes(x= line, y=shannon_entropy, fill=line)) +
+plot2<-met_D10 %>%
+  filter(!is.na(Shannon)) %>%
+  ggplot(aes(x= line, y=Shannon, fill=line)) +
   stat_summary(geom="bar", fun.data=mean_se, color="black") + #here black is the outline for the bars
   geom_jitter(shape=21, width=0.1, height=0) +
   coord_cartesian(ylim=c(0,7)) + # adjust y-axis
@@ -146,18 +145,16 @@ plot2<-met3 %>%
   scale_fill_manual(legend_title, values=c("black","white")) + #use renamed legend and specify custom colors
   theme(legend.position="right") + theme(axis.text.x=element_blank())+ theme(text=element_text(size = 15)) 
 
-
+plot2
 
 plot <- ggarrange(plot1 + rremove("ylab") + rremove("xlab"), plot2 + rremove("ylab") + rremove("xlab"), # remove axis labels from plots
                   ncol = 1, nrow = 2,
                   common.legend = TRUE, legend = "bottom")
 
 
-
 annotate_figure(plot, left = textGrob("Shannon Diversity", rot = 90, vjust = 0.5, gp = gpar(cex = 1.3)),
                 bottom = textGrob("Diet", gp = gpar(cex = 1.3)))
 
-```
 
 # significance of variables
 
