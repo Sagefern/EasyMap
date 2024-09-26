@@ -10,6 +10,8 @@ load_package <- function(p) {
 }
 invisible(lapply(c(p1,p2), load_package))
 install.packages("ggpubr", repos = "https://cloud.r-project.org/", dependencies = TRUE)
+library(ggplot2)
+library(ggpubr)
 warnings()
 
 #Building a phyloseq object
@@ -199,8 +201,7 @@ write.csv(tab.shannon, "tab_shannon.csv", row.names = FALSE)
 
 
 # PCOA plots using the same phyloseq object
-library(ggplot2)
-library(ggpubr)
+
 #PCOA: for each diet based on experimental days**
 ###CF**###
 
