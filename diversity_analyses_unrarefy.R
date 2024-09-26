@@ -85,10 +85,12 @@ library(qiime2R)
 #write.table(metadata2, file = "shannonmetadata.csv", sep = ",")
 
 ##Shannon boxplots (diet?)
+library(phyloseq)
 plot_richness(ps, x="line", measures=c("Shannon")) +
   geom_boxplot() +
   theme_classic() +
   theme(strip.background = element_blank(), axis.text.x.bottom = element_text(angle = -90))
+shannon_entropy <- rownames_to_column(estimate_richness(ps, split = TRUE, measures = "Shannon"), var = "SampleID")
 
 
 ##For Shannon diversity,  pairwise test with Wilcoxon rank-sum test, corrected by FDR method:
