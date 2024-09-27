@@ -195,9 +195,16 @@ tab.shannon
 # Exporting to CSV
 write.csv(tab.shannon, "tab_shannon.csv", row.names = FALSE)
 
+
+
 ##Beta Diversity
-
-
+#Bray curtis dissimilarity matrix
+relab_genera = transform_sample_counts(ps, function(x) x / sum(x) * 100)
+abrel_bray <- phyloseq::distance(relab_genera, method = "bray")
+abrel_bray <- as.matrix(abrel_bray)
+head(abrel_bray)[,1:6]
+# Save the matrix as a table
+write.table(abrel_bray, file = "Final_bray_curtis_result.txt", sep = "\t", col.names = NA)
 
 # PCOA plots using the same phyloseq object
 
