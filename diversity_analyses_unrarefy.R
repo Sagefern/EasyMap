@@ -12,6 +12,7 @@ invisible(lapply(c(p1,p2), load_package))
 install.packages("ggpubr", repos = "https://cloud.r-project.org/", dependencies = TRUE)
 library(ggplot2)
 library(ggpubr)
+library(mvabund)
 warnings()
 
 #Building a phyloseq object
@@ -206,11 +207,58 @@ head(abrel_bray)[,1:6]
 # Save the matrix as a table
 write.table(abrel_bray, file = "Final_bray_curtis_result.txt", sep = "\t", col.names = NA)
 
+
+#MVABUND
+meta <- read.csv(file = "L6clean.csv", header = TRUE)
+
+View(meta)
+
+meta_spp <- mvabund(meta[, 7:178])
+
+par(mar = c(2, 10, 2, 2)) # adjusts the margins
+boxplot(meta[, 7:178], horizontal = TRUE, las = 2, main = "Abundance")
+#OTUs 1 to 4 are much more abundant and variable than others. It's probably a good idea to check our mean-variance relationship
+
+
+meanvar.plot(meta_spp)
+#species with low mean have low variance and high means (on the x axis) also have high variances (y axis). We can deal with this relationship by choosing a family of GLMs with an appropriate mean-variance assumption.
+#The default family used by mvabund when fitting multivariate GLMs is negative binomial.
+
+plot(meta_spp ~ as.factor(meta$Diet), cex.axis = 0.8, cex = 0.8)
+
+mod1 <- manyglm(meta_spp ~ meta$Diet, family = "poisson")
+plot(mod1) #not evenly distributed. not good
+
+mod2 <- manyglm(meta_spp ~ meta$Diet, family = "negative_binomial")
+plot(mod2) #This residual plot is much better, there is now no discernible fan shape and we will use this model for all further analysis.
+
+anova(mod2)
+
+plot1<- anova(mod2, p.uni = "adjusted")
+plot1
+
+mod3 <- manyglm(meta_spp ~ meta$gut.mass, family = "negative_binomial")
+plot(mod3)
+anova(mod3)
+
+mod4 <- manyglm(meta_spp ~ meta$biomass, family = "negative_binomial")
+plot(mod4)
+anova(mod4)
+
+mod5 <- manyglm(meta_spp ~ meta$bioconversion, family = "negative_binomial")
+anova(mod5)
+
+mod6 <- manyglm(meta_spp ~ meta$endpoint, family = "negative_binomial")
+anova(mod6)
+
+
+mod7 <- manyglm(meta_spp ~ meta$Diet*meta$Line*meta$Substrate*meta$Larval.age, family = "negative_binomial")
+anova(mod7)
+
 # PCOA plots using the same phyloseq object
 
 #PCOA: for each diet based on experimental days**
 ###CF**###
-
 ps.sub.CTRL <- subset_samples(ps, diet %in% c("D0", "CF"))
 
 dist = phyloseq::distance(ps.sub.CTRL, method="bray")
