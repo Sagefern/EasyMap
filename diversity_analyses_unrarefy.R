@@ -237,22 +237,13 @@ anova(mod2)
 plot1<- anova(mod2, p.uni = "adjusted")
 plot1
 
-mod3 <- manyglm(meta_spp ~ meta$gut.mass, family = "negative_binomial")
-plot(mod3)
+mod3 <- manyglm(meta_spp ~ meta$Line, family = "negative_binomial")
 anova(mod3)
 
-mod4 <- manyglm(meta_spp ~ meta$biomass, family = "negative_binomial")
-plot(mod4)
+mod4 <- manyglm(meta_spp ~ meta$Larval.age, family = "negative_binomial")
 anova(mod4)
 
-mod5 <- manyglm(meta_spp ~ meta$bioconversion, family = "negative_binomial")
-anova(mod5)
-
-mod6 <- manyglm(meta_spp ~ meta$endpoint, family = "negative_binomial")
-anova(mod6)
-
-
-mod7 <- manyglm(meta_spp ~ meta$Diet*meta$Line*meta$Substrate*meta$Larval.age, family = "negative_binomial")
+mod7 <- manyglm(meta_spp ~ meta$Diet*meta$Line*meta$Larval.age, family = "negative_binomial")
 anova(mod7)
 
 # PCOA plots using the same phyloseq object
@@ -393,3 +384,6 @@ print(p10)
 
 
 ggarrange(p1, p2, p8, p10, p5, p3, p9, p6, p7, p4, nrow=5, ncol=2, common.legend = TRUE, legend="bottom")
+
+##Genus abundance boxplot
+
