@@ -385,5 +385,26 @@ print(p10)
 
 ggarrange(p1, p2, p8, p10, p5, p3, p9, p6, p7, p4, nrow=5, ncol=2, common.legend = TRUE, legend="bottom")
 
-##Genus abundance boxplot
+##Taxa abundance boxplot
+#transform data so each sample have their own columns 
+library(dplyr)
+library(tidyr)
+data <- read.csv("L6clean.csv", stringsAsFactors = FALSE)
+str(data)
+data_trimmed <- data %>%
+  select(-c(2:6))
+head(data_trimmed)
+# Reshape the data to long format first
+data_long <- data_trimmed %>%
+  pivot_longer(cols = -Sample, names_to = "Genus", values_to = "Count")
+# Then reshape to wide format
+data_wide <- data_long %>%
+  pivot_wider(names_from = Sample, values_from = Count, values_fill = 0)
+head(data_wide)
+# Save the data_wide to a CSV file
+write.csv(data_wide, "Normalised_abundance_L6.csv", row.names = FALSE)
+
+#Phylum abundance boxplot (top 6)
+#Genus abundance boxplot (top 15)
+
 
