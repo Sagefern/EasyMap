@@ -389,7 +389,7 @@ ggarrange(p1, p2, p8, p10, p5, p3, p9, p6, p7, p4, nrow=5, ncol=2, common.legend
 #transform data so each sample have their own columns 
 library(dplyr)
 library(tidyr)
-data <- read.csv("L6clean.csv", stringsAsFactors = FALSE)
+data <- read.csv("L2clean.csv", stringsAsFactors = FALSE)
 str(data)
 data_trimmed <- data %>%
   select(-c(2:6))
@@ -402,7 +402,7 @@ data_wide <- data_long %>%
   pivot_wider(names_from = Sample, values_from = Count, values_fill = 0)
 head(data_wide)
 # Save the data_wide to a CSV file
-write.csv(data_wide, "Normalised_abundance_L6.csv", row.names = FALSE)
+write.csv(data_wide, "Normalised_abundance_L2.csv", row.names = FALSE)
 
 #Phylum abundance boxplot (top 6)
 #Genus abundance boxplot (top 15)
