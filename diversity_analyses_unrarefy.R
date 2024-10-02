@@ -393,7 +393,6 @@ data <- read.csv("L2clean.csv", stringsAsFactors = FALSE)
 str(data)
 data_trimmed <- data %>%
   select(-c(2:6))
-head(data_trimmed)
 # Reshape the data to long format first
 data_long <- data_trimmed %>%
   pivot_longer(cols = -Sample, names_to = "Genus", values_to = "Count")
