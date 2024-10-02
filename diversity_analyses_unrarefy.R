@@ -71,6 +71,7 @@ SAMPLE <- sample_data(metadata)
 TREE = read_tree("tree.nwk")
 # merge the data
 ps <- phyloseq(OTU, TAX, SAMPLE,TREE)
+tax_table(ps) <- gsub("\\[|\\]", "", tax_table(ps))
 
 ######Alpha Diversity#########
 ##Shannon plot##
@@ -386,6 +387,38 @@ print(p10)
 ggarrange(p1, p2, p8, p10, p5, p3, p9, p6, p7, p4, nrow=5, ncol=2, common.legend = TRUE, legend="bottom")
 
 ##Taxa abundance boxplot
+.cran_packages <- c("tidyverse", "cowplot", "picante", "vegan", "HMP", "dendextend", "rms", "devtools")
+.bioc_packages <- c("phyloseq", "DESeq2", "microbiome", "metagenomeSeq", "ALDEx2")
+.inst <- .cran_packages %in% installed.packages()
+if(any(!.inst)) {
+  install.packages(.cran_packages[!.inst])
+}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install(.bioc_packages, version = "3.9")
+devtools::install_github("adw96/breakaway")
+devtools::install_github(repo = "UVic-omics/selbal")
+library(tidyverse); packageVersion("tidyverse")                 
+## [1] '1.3.0'
+library(phyloseq); packageVersion("phyloseq")                    
+## [1] '1.32.0'
+library(DESeq2); packageVersion("DESeq2")                        
+## [1] '1.28.1'
+library(microbiome); packageVersion("microbiome")               
+## [1] '1.10.0'
+library(vegan); packageVersion("vegan")                          
+## [1] '2.5.6'
+library(picante); packageVersion("picante")                       
+## [1] '1.8.2'
+library(ALDEx2); packageVersion("ALDEx2")                        
+## [1] '1.21.1'
+library(metagenomeSeq); packageVersion("metagenomeSeq")          
+
+library(BiocManager)
+BiocManager::install("microbiome")
+install.packages("remotes")
+remotes::install_github("microsud/microbiomeutilities")
+
 #transform data so each sample have their own columns 
 library(dplyr)
 library(tidyr)
@@ -403,7 +436,45 @@ head(data_wide)
 # Save the data_wide to a CSV file
 write.csv(data_wide, "Normalised_abundance_L2.csv", row.names = FALSE)
 
-#Phylum abundance boxplot (top 6)
-#Genus abundance boxplot (top 15)
 
+#Phylum abundance boxplot (top 6)
+ps_rel_abund = phyloseq::transform_sample_counts(ps, function(x){x / sum(x)})
+
+ps_phylum <- phyloseq::tax_glom(ps_rel_abund, "Phylum")
+phyloseq::taxa_names(ps_phylum) <- phyloseq::tax_table(ps_phylum)[, "Phylum"]
+#phyloseq::otu_table(ps_phylum)[1:5, 1:5]
+ps_phylum <- microbiomeutilities::aggregate_top_taxa2(ps_phylum, "Phylum", top = 5)
+
+p<-phyloseq::psmelt(ps_phylum) %>%
+  ggplot(data = ., aes(x=diet, y = Abundance)) +
+  geom_boxplot(outlier.shape  = NA) +
+  geom_jitter(aes(shape = line)) + theme_bw()+ theme(legend.position="none")+
+  scale_shape_manual(values = c(WT = 1,LD = 16)) +
+  labs(x = "", y = "Relative Abundance\n") +
+  facet_wrap(~ OTU, scales = "free")
+
+p + ggtitle("A")+ ylim(0,1.0)
+p + ggtitle("A")+ ylim(0,1.0) +scale_x_discrete(limits = c("D0", "CF", "MHP", "MLP","M","NUS","OKA","PKM","P","RIB","SBM"))
+
+#Genus abundance boxplot (top 15)
+table(phyloseq::tax_table(ps)[, "Genus"])
+ps_rel_abund = phyloseq::transform_sample_counts(ps, function(x){x / sum(x)})
+#phyloseq::otu_table(ps)[1:5, 1:5]
+#phyloseq::otu_table(ps_rel_abund)[1:5, 1:5]
+ps_genus <- phyloseq::tax_glom(ps_rel_abund, "Genus")
+
+#phyloseq::otu_table(ps_genus)[1:5, 1:5]
+
+ps_genus <- microbiomeutilities::aggregate_top_taxa2(ps_genus, "Genus", top = 14)
+
+p2<-phyloseq::psmelt(ps_genus) %>%
+  ggplot(data = ., aes(x = diet, y = Abundance)) +
+  geom_boxplot(outlier.shape  = NA) +
+  geom_jitter(aes(shape = line)) + theme_bw()+ 
+  scale_shape_manual(values = c(WT = 1,LD = 16)) +
+  labs(x = "", y = "Relative Abundance\n") + theme(legend.position="none")+
+  facet_wrap(~ OTU, scales = "free",ncol = 3)
+
+
+p2 + ggtitle("B") +scale_x_discrete(limits = c("D0", "CF", "MHP", "MLP","M","NUS","OKA","PKM","P","RIB","SBM"))
 
